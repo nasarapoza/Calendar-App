@@ -1,4 +1,5 @@
 package com.team9.calbuddy;
+import java.util.Calendar;
 
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import android.app.Dialog;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -33,16 +35,23 @@ import java.io.IOException;
 public class AddEvent extends AppCompatActivity
         implements View.OnClickListener {
 
+    static final int REQUEST_AUTHORIZATION = 1001;
+
     GoogleAccountCredential mCredential = null;
     com.google.api.services.calendar.Calendar mService = null;
     EditText mEdit = null;
 
     Button btn_sd, btn_ed;
     int year_x, month_x, day_x;
-    static final int DIALOG_ID = 0;
-
+    //static final int DIALOG_ID = 0;
+    static final int startDate = 1;
+    static final int startTime = 2;
+    static final int endDate = 3;
+    static final int endTime = 4;
     Button btn_st, btn_et;
     int hour_x, minute_x;
+
+    EditText txtSDate, txtSTime, txtEDate, txtETime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +71,17 @@ public class AddEvent extends AppCompatActivity
                 .build();
         showDialogOnButtonClick();
         showTimePickerDialog();
+
+        //btn_sd = (Button)findViewById(R.id.button_SD);
+        //btn_st = (Button)findViewById(R.id.button_ST);
+
+        txtSDate = (EditText) findViewById(R.id.startEdit);
+        txtSTime = (EditText) findViewById(R.id.startTimeEdit);
+        txtEDate = (EditText) findViewById(R.id.endEdit);
+        txtETime = (EditText) findViewById(R.id.endTimeEdit);
+
+        //btn_sd.setOnClickListener(this);
+        //btn_st.setOnClickListener(this);
     }
 
     /* displays calendar when users pick up date */
@@ -72,7 +92,7 @@ public class AddEvent extends AppCompatActivity
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showDialog(DIALOG_ID);
+                        showDialog(startDate);
                     }
                 }
         );
@@ -80,7 +100,7 @@ public class AddEvent extends AppCompatActivity
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showDialog(DIALOG_ID);
+                        showDialog(endDate);
                     }
                 }
         );
@@ -101,6 +121,8 @@ public class AddEvent extends AppCompatActivity
             month_x = monthOfYear;
             day_x = dayOfMonth;
             Toast.makeText(AddEvent.this, year_x+ "/" + month_x + "/" + day_x, Toast.LENGTH_LONG).show();
+            // Display Selected date in textbox
+            txtSDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
         }
     };
 
@@ -112,6 +134,7 @@ public class AddEvent extends AppCompatActivity
             month_x = monthOfYear;
             day_x = dayOfMonth;
             Toast.makeText(AddEvent.this, year_x+ "/" + month_x + "/" + day_x, Toast.LENGTH_LONG).show();
+            txtEDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
         }
     };
 
@@ -122,7 +145,7 @@ public class AddEvent extends AppCompatActivity
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showDialog(DIALOG_ID);
+                        showDialog(startTime);
                     }
                 }
         );
@@ -130,23 +153,28 @@ public class AddEvent extends AppCompatActivity
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showDialog(DIALOG_ID);
+                        showDialog(endTime);
                     }
                 }
         );
 
     }
 
-    static final int startDate = 0;
-    static final int startTime = 5;
-    static final int endDate = 6;
-    static final int endTime = 7;
 
     @Override
     protected Dialog onCreateDialog(int id) {
+        // Process to get Current Date
+        final Calendar c = Calendar.getInstance();
+        year_x = c.get(Calendar.YEAR);
+        month_x = c.get(Calendar.MONTH);
+        day_x = c.get(Calendar.DAY_OF_MONTH);
+        hour_x = c.get(Calendar.HOUR_OF_DAY);
+        minute_x = c.get(Calendar.MINUTE);
+
+
         switch (id) {
             case startDate:
-                return new DatePickerDialog(AddEvent.this, sdpickerListner, year_x, month_x, day_x);
+                return new DatePickerDialog (AddEvent.this, sdpickerListner, year_x, month_x, day_x);
             case startTime:
                 return new TimePickerDialog(AddEvent.this, stTimePickerListener, hour_x, minute_x, false);
             case endDate:
@@ -164,6 +192,8 @@ public class AddEvent extends AppCompatActivity
             hour_x = hourOfDay;
             minute_x = minute;
             Toast.makeText(AddEvent.this, hour_x+ ": " + minute_x + ": " + day_x, Toast.LENGTH_LONG).show();
+            // Display Selected time in textbox
+            txtSTime.setText(hourOfDay + ":" + minute);
         }
     };
 
@@ -174,6 +204,7 @@ public class AddEvent extends AppCompatActivity
             hour_x = hourOfDay;
             minute_x = minute;
             Toast.makeText(AddEvent.this, hour_x+ ": " + minute_x + ": " + day_x, Toast.LENGTH_LONG).show();
+            txtETime.setText(hourOfDay + ":" + minute);
         }
     };
 
@@ -181,8 +212,55 @@ public class AddEvent extends AppCompatActivity
     @Override
     public void onClick(View v) {
         AsyncTask<Void, Void, Void> task = new AddEventTask();
-        task.execute();
+/*        if (v == btn_sd) {
+
+            // Process to get Current Date
+            final Calendar c = Calendar.getInstance();
+            year_x = c.get(Calendar.YEAR);
+            month_x = c.get(Calendar.MONTH);
+            day_x = c.get(Calendar.DAY_OF_MONTH);
+
+            //new DatePickerDialog (AddEvent.this, sdpickerListner, year_x, month_x, day_x);
+/*            // Launch Date Picker Dialog
+            DatePickerDialog dpd = new DatePickerDialog(this,
+                    new DatePickerDialog.OnDateSetListener() {
+
+                        @Override
+                        public void onDateSet(DatePicker view, int year,
+                                              int monthOfYear, int dayOfMonth) {
+                            // Display Selected date in textbox
+                            txtDate.setText(dayOfMonth + "-"
+                                    + (monthOfYear + 1) + "-" + year);
+
+                        }
+                    }, year_x, month_x, day_x);
+            dpd.show();
+*/        //}
+/*        if (v == btn_st) {
+
+            // Process to get Current Time
+            final Calendar c = Calendar.getInstance();
+            hour_x = c.get(Calendar.HOUR_OF_DAY);
+            minute_x = c.get(Calendar.MINUTE);
+            new TimePickerDialog(AddEvent.this, stTimePickerListener, hour_x, minute_x, false);
+/*
+            // Launch Time Picker Dialog
+            TimePickerDialog tpd = new TimePickerDialog(this,
+                    new TimePickerDialog.OnTimeSetListener() {
+
+                        @Override
+                        public void onTimeSet(TimePicker view, int hourOfDay,
+                                              int minute) {
+                            // Display Selected time in textbox
+                            txtTime.setText(hourOfDay + ":" + minute);
+                        }
+                    }, hour_x, minute_x, false);
+            tpd.show();
+*/        //}
     }
+
+
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -210,9 +288,10 @@ public class AddEvent extends AppCompatActivity
             id = mEdit.getText().toString();
             mEdit = (EditText) findViewById(R.id.startEdit);
             startDate = mEdit.getText().toString();
-            mEdit = (EditText) findViewById(R.id.startTimeEdit);
-            startTime = mEdit.getText().toString();
+            //startDate = year_x + month_x + day_x;
             mEdit = (EditText) findViewById(R.id.endEdit);
+            startTime = mEdit.getText().toString();
+            mEdit = (EditText) findViewById(R.id.startTimeEdit);
             endDate = mEdit.getText().toString();
             mEdit = (EditText) findViewById(R.id.endTimeEdit);
             endTime = mEdit.getText().toString();
@@ -238,9 +317,12 @@ public class AddEvent extends AppCompatActivity
             try {
                 AddEvents();
                 mService.events().quickAdd(calendarId, eventText).execute();
+            } catch (UserRecoverableAuthIOException e) {
+                startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
 
             return null;
         }
