@@ -1,4 +1,4 @@
-    package com.team9.calbuddy;
+package com.team9.calbuddy;
 import java.util.Calendar;
 
 import org.joda.time.DateTime;
@@ -56,13 +56,13 @@ public class AddEvent extends AppCompatActivity
 
     Button btn_sd, btn_ed, btn_st, btn_et;
     int year_x, month_x, day_x, hour_x, minute_x;
-    //static final int DIALOG_ID = 0;
     static final int startDate = 1;
     static final int startTime = 2;
     static final int endDate = 3;
     static final int endTime = 4;
 
     EditText txtSDate, txtSTime, txtEDate, txtETime;
+    String tempEDate, tempSDate, tempSTime, tempETime = " ";
 
 
     @Override
@@ -121,7 +121,8 @@ public class AddEvent extends AppCompatActivity
             Toast.makeText(AddEvent.this, year_x+ "/" + month_x + "/" + day_x, Toast.LENGTH_LONG).show();
             // Display Selected date in textbox
             //txtSDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-            txtSDate.setText(year_x + "-" + (month_x + 1) + "-" + day_x);
+            txtSDate.setText(year_x + "-" + (month_x + 1) + "-" + day_x + tempSTime);
+            tempSDate = year_x + "-" + (month_x + 1) + "-" + day_x;
             //txtSDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
         }
     };
@@ -134,7 +135,8 @@ public class AddEvent extends AppCompatActivity
             month_x = monthOfYear;
             day_x = dayOfMonth;
             Toast.makeText(AddEvent.this, year_x+ "/" + month_x + "/" + day_x, Toast.LENGTH_LONG).show();
-            txtEDate.setText(year_x + "-" + (month_x + 1) + "-" + day_x);
+            txtEDate.setText(year_x + "-" + (month_x + 1) + "-" + day_x + tempETime);
+            tempEDate = year_x + "-" + (month_x + 1) + "-" + day_x;
             //txtSDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
         }
     };
@@ -193,13 +195,16 @@ public class AddEvent extends AppCompatActivity
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             hour_x = hourOfDay;
             minute_x = minute;
-            Toast.makeText(AddEvent.this, hour_x+ ": " + minute_x + ": " + day_x, Toast.LENGTH_LONG).show();
+            Toast.makeText(AddEvent.this, hour_x + ": " + minute_x + ": " + day_x, Toast.LENGTH_LONG).show();
+            tempSTime = " " + hour_x + ":" + minute_x + ":00";
             // Display Selected time in textbox
             if(minute_x < 10)
-                txtSTime.append(" " + hourOfDay + ":0" + minute + ":00");
+                txtSTime.setText(tempSDate + " " + hourOfDay + ":0" + minute + ":00");
             //txtSTime.setText(year_x + "-" + (month_x + 1) + "-" + day_x + " " + hourOfDay + ":0" + minute + ":00");
+            else if(hour_x < 10)
+                txtSTime.setText(tempSDate + " 0" + hourOfDay + ":" + minute + ":00");
             else {
-                txtSTime.append(" " + hourOfDay + ":" + minute + ":00");
+                txtSTime.setText(tempSDate + " " + hourOfDay + ":" + minute + ":00");
                 //txtSTime.setText(year_x + "-" + (month_x + 1) + "-" + day_x + " " + hourOfDay + ":" + minute + ":00");
             }
         }
@@ -212,11 +217,15 @@ public class AddEvent extends AppCompatActivity
             hour_x = hourOfDay;
             minute_x = minute;
             Toast.makeText(AddEvent.this, hour_x+ ": " + minute_x + ": " + day_x, Toast.LENGTH_LONG).show();
+            tempETime = " " + hour_x + ":" + minute_x + ":00";
+
             if(minute_x < 10)
-                txtETime.append(" " + hourOfDay + ":0" + minute + ":00");
+                txtETime.setText(tempEDate + " " + hourOfDay + ":0" + minute + ":00");
                 //txtSTime.setText(year_x + "-" + (month_x + 1) + "-" + day_x + " " + hourOfDay + ":0" + minute + ":00");
+            else if(hour_x < 10)
+                txtSTime.setText(tempEDate + " 0" + hourOfDay + ":" + minute + ":00");
             else {
-                txtETime.append(" " + hourOfDay + ":" + minute + ":00");
+                txtETime.setText(tempEDate + " " + hourOfDay + ":" + minute + ":00");
                 //txtETime.setText(year_x + "-" + (month_x + 1) + "-" + day_x + " " + hourOfDay + ":" + minute + ":00");
             }
         }
@@ -304,7 +313,5 @@ public class AddEvent extends AppCompatActivity
             return null;
         }
     }
-}
-}
 }
 
