@@ -11,11 +11,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Event Title"
+        android:text="Title"
         android:id="@+id/titleText"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="#A6128D" />
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -35,8 +34,7 @@
         android:id="@+id/textView4"
         android:layout_below="@+id/titleEdit"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="#A6128D" />
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -56,8 +54,7 @@
         android:id="@+id/textView6"
         android:layout_below="@+id/locEdit"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="#A6128D" />
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -73,21 +70,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Start Date"
+        android:text="Start Date (Enter format: yyyy-MM-dd HH:mm:ss)"
         android:id="@+id/textView7"
         android:layout_below="@+id/idEdit"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="#A6128D" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pick Date"
-        android:id="@+id/button_SD"
-        android:layout_below="@+id/idEdit"
-        android:layout_alignRight="@+id/startEdit"
-        android:layout_alignEnd="@+id/startEdit" />
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -99,101 +86,63 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Start Time"
-        android:id="@+id/textView8"
-        android:layout_below="@+id/startEdit"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="#A6128D" />
+        android:text="Date"
+        android:id="@+id/button_SD"
+        android:layout_alignTop="@+id/startEdit"
+        android:layout_toRightOf="@+id/groupButton"
+        android:layout_toEndOf="@+id/groupButton"
+        android:layout_above="@+id/textView8" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pick Time"
+        android:text="Time"
         android:id="@+id/button_ST"
+        android:layout_above="@+id/textView8"
+        android:layout_alignTop="@+id/startEdit"
+        android:layout_alignRight="@+id/startEdit"
+        android:layout_alignEnd="@+id/startEdit" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="End Date (Enter Format: yyyy-MM-dd HH:mm:ss)"
+        android:id="@+id/textView8"
         android:layout_below="@+id/startEdit"
-        android:layout_alignRight="@+id/button_SD"
-        android:layout_alignEnd="@+id/button_SD"
-        android:layout_alignLeft="@+id/button_SD"
-        android:layout_alignStart="@+id/button_SD" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/endEdit"
-        android:layout_below="@+id/textView9"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="End Date"
-        android:id="@+id/textView9"
-        android:layout_below="@+id/startTimeEdit"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="#A6128D" />
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pick Date"
-        android:id="@+id/button_ED"
-        android:layout_below="@+id/startTimeEdit"
-        android:layout_alignRight="@+id/endEdit"
-        android:layout_alignEnd="@+id/endEdit" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/startTimeEdit"
         android:layout_below="@+id/textView8"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="End Time"
-        android:id="@+id/textView10"
-        android:layout_below="@+id/endEdit"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="#A6128D" />
+        android:text="Date"
+        android:id="@+id/button_ED"
+        android:layout_above="@+id/textViewGroup"
+        android:layout_toRightOf="@+id/groupButton"
+        android:layout_toEndOf="@+id/groupButton" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pick Time"
+        android:text="Time"
         android:id="@+id/button_ET"
-        android:layout_below="@+id/endEdit"
-        android:layout_alignRight="@+id/endTimeEdit"
-        android:layout_alignEnd="@+id/endTimeEdit" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/endTimeEdit"
-        android:layout_below="@+id/textView10"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/endEdit"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:clickable="false"
-        android:contextClickable="false"
-        android:textIsSelectable="false" />
+        android:layout_alignParentEnd="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -201,7 +150,38 @@
         android:text="Add Event"
         android:id="@+id/addButton"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignRight="@+id/textView8"
+        android:layout_alignEnd="@+id/textView8" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Group Event"
+        android:id="@+id/groupButton"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/titleText"
+        android:layout_toEndOf="@+id/titleText" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Enter Email (if group)"
+        android:id="@+id/textViewGroup"
+        android:layout_below="@+id/endEdit"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextEmail"
+        android:layout_below="@+id/textViewGroup"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
 

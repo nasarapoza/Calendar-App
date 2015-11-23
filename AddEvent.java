@@ -1,63 +1,74 @@
 package com.team9.calbuddy;
 import java.util.Calendar;
 
+import org.joda.time.DateTime;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Button;
-import android.widget.Toast;
-import android.app.TimePickerDialog;
-import android.widget.TimePicker;
+
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
+import android.widget.TimePicker;
+import android.widget.Toast;
+import android.widget.DatePicker;
+
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+//import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.EventDateTime;
-import com.google.api.services.calendar.model.EventAttendee;
-import com.google.api.services.calendar.model.EventReminder;
-
-import java.util.Arrays;
-
+import com.google.api.services.calendar.model.FreeBusyRequest;
+import com.google.api.services.calendar.Calendar.Freebusy;
+import com.google.api.services.calendar.model.FreeBusyRequestItem;
+import com.google.api.services.calendar.Calendar.Freebusy.Query;
+import com.google.api.services.calendar.model.FreeBusyResponse;
+import com.google.api.services.calendar.model.TimePeriod;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 
 public class AddEvent extends AppCompatActivity
         implements View.OnClickListener {
 
-    static final int REQUEST_AUTHORIZATION = 1001;
-
     GoogleAccountCredential mCredential = null;
     com.google.api.services.calendar.Calendar mService = null;
     EditText mEdit = null;
+    String calID;
 
-    Button btn_sd, btn_ed;
-    int year_x, month_x, day_x;
+    Button btn_sd, btn_ed, btn_st, btn_et;
+    int year_x, month_x, day_x, hour_x, minute_x;
     //static final int DIALOG_ID = 0;
     static final int startDate = 1;
     static final int startTime = 2;
     static final int endDate = 3;
     static final int endTime = 4;
-    Button btn_st, btn_et;
-    int hour_x, minute_x;
 
     EditText txtSDate, txtSTime, txtEDate, txtETime;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
-
 
         findViewById(R.id.addButton).setOnClickListener(this);
 
@@ -72,16 +83,10 @@ public class AddEvent extends AppCompatActivity
         showDialogOnButtonClick();
         showTimePickerDialog();
 
-        //btn_sd = (Button)findViewById(R.id.button_SD);
-        //btn_st = (Button)findViewById(R.id.button_ST);
-
         txtSDate = (EditText) findViewById(R.id.startEdit);
-        txtSTime = (EditText) findViewById(R.id.startTimeEdit);
+        txtSTime = (EditText) findViewById(R.id.startEdit);
         txtEDate = (EditText) findViewById(R.id.endEdit);
-        txtETime = (EditText) findViewById(R.id.endTimeEdit);
-
-        //btn_sd.setOnClickListener(this);
-        //btn_st.setOnClickListener(this);
+        txtETime = (EditText) findViewById(R.id.endEdit);
     }
 
     /* displays calendar when users pick up date */
@@ -105,14 +110,7 @@ public class AddEvent extends AppCompatActivity
                 }
         );
     }
-/*
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        if(id == DIALOG_ID)
-            return new DatePickerDialog(this, dpickerListner, year_x, month_x, day_x);
-        return null;
-    }
-*/
+
     private DatePickerDialog.OnDateSetListener sdpickerListner
             = new DatePickerDialog.OnDateSetListener() {
         @Override
@@ -122,7 +120,9 @@ public class AddEvent extends AppCompatActivity
             day_x = dayOfMonth;
             Toast.makeText(AddEvent.this, year_x+ "/" + month_x + "/" + day_x, Toast.LENGTH_LONG).show();
             // Display Selected date in textbox
-            txtSDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+            //txtSDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+            txtSDate.setText(year_x + "-" + (month_x + 1) + "-" + day_x);
+            //txtSDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
         }
     };
 
@@ -134,7 +134,8 @@ public class AddEvent extends AppCompatActivity
             month_x = monthOfYear;
             day_x = dayOfMonth;
             Toast.makeText(AddEvent.this, year_x+ "/" + month_x + "/" + day_x, Toast.LENGTH_LONG).show();
-            txtEDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+            txtEDate.setText(year_x + "-" + (month_x + 1) + "-" + day_x);
+            //txtSDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
         }
     };
 
@@ -193,7 +194,11 @@ public class AddEvent extends AppCompatActivity
             minute_x = minute;
             Toast.makeText(AddEvent.this, hour_x+ ": " + minute_x + ": " + day_x, Toast.LENGTH_LONG).show();
             // Display Selected time in textbox
-            txtSTime.setText(hourOfDay + ":" + minute);
+            if(minute_x < 10)
+                txtSTime.setText(year_x + "-" + (month_x + 1) + "-" + day_x + " " + hourOfDay + ":0" + minute + ":00");
+            else {
+                txtSTime.setText(year_x + "-" + (month_x + 1) + "-" + day_x + " " + hourOfDay + ":" + minute + ":00");
+            }
         }
     };
 
@@ -204,70 +209,29 @@ public class AddEvent extends AppCompatActivity
             hour_x = hourOfDay;
             minute_x = minute;
             Toast.makeText(AddEvent.this, hour_x+ ": " + minute_x + ": " + day_x, Toast.LENGTH_LONG).show();
-            txtETime.setText(hourOfDay + ":" + minute);
+            if(minute_x < 10)
+                txtSTime.setText(year_x + "-" + (month_x + 1) + "-" + day_x + " " + hourOfDay + ":0" + minute + ":00");
+            else {
+                txtETime.setText(year_x + "-" + (month_x + 1) + "-" + day_x + " " + hourOfDay + ":" + minute + ":00");
+            }
         }
     };
 
 
     @Override
     public void onClick(View v) {
-        AsyncTask<Void, Void, Void> task = new AddEventTask();
-/*        if (v == btn_sd) {
-
-            // Process to get Current Date
-            final Calendar c = Calendar.getInstance();
-            year_x = c.get(Calendar.YEAR);
-            month_x = c.get(Calendar.MONTH);
-            day_x = c.get(Calendar.DAY_OF_MONTH);
-
-            //new DatePickerDialog (AddEvent.this, sdpickerListner, year_x, month_x, day_x);
-/*            // Launch Date Picker Dialog
-            DatePickerDialog dpd = new DatePickerDialog(this,
-                    new DatePickerDialog.OnDateSetListener() {
-
-                        @Override
-                        public void onDateSet(DatePicker view, int year,
-                                              int monthOfYear, int dayOfMonth) {
-                            // Display Selected date in textbox
-                            txtDate.setText(dayOfMonth + "-"
-                                    + (monthOfYear + 1) + "-" + year);
-
-                        }
-                    }, year_x, month_x, day_x);
-            dpd.show();
-*/        //}
-/*        if (v == btn_st) {
-
-            // Process to get Current Time
-            final Calendar c = Calendar.getInstance();
-            hour_x = c.get(Calendar.HOUR_OF_DAY);
-            minute_x = c.get(Calendar.MINUTE);
-            new TimePickerDialog(AddEvent.this, stTimePickerListener, hour_x, minute_x, false);
-/*
-            // Launch Time Picker Dialog
-            TimePickerDialog tpd = new TimePickerDialog(this,
-                    new TimePickerDialog.OnTimeSetListener() {
-
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay,
-                                              int minute) {
-                            // Display Selected time in textbox
-                            txtTime.setText(hourOfDay + ":" + minute);
-                        }
-                    }, hour_x, minute_x, false);
-            tpd.show();
-*/        //}
+        switch (v.getId()) {
+            case R.id.addButton:
+                AsyncTask<Void, Void, Void> task = new AddEventTask();
+                task.execute();
+                break;
+        }
     }
-
-
 
     @Override
     protected void onResume() {
         super.onResume();
     }
-
-
-
 
     private class AddEventTask extends AsyncTask<Void,Void,Void> {
         private Exception mLastError = null;
@@ -276,105 +240,64 @@ public class AddEvent extends AppCompatActivity
         private String id;
         private String startDate;
         private String endDate;
-        private String startTime;
-        private String endTime;
+        private DateFormat df;
+
+        com.google.api.client.util.DateTime startTime;
+        com.google.api.client.util.DateTime endTime;
+        Date start;
+        Date end;
 
         public AddEventTask() {
             mEdit = (EditText) findViewById(R.id.titleEdit);
             title = mEdit.getText().toString();
+
             mEdit = (EditText) findViewById(R.id.locEdit);
             loc = mEdit.getText().toString();
+
             mEdit = (EditText) findViewById(R.id.idEdit);
             id = mEdit.getText().toString();
+
             mEdit = (EditText) findViewById(R.id.startEdit);
             startDate = mEdit.getText().toString();
-            //startDate = year_x + month_x + day_x;
-            mEdit = (EditText) findViewById(R.id.endEdit);
-            startTime = mEdit.getText().toString();
-            mEdit = (EditText) findViewById(R.id.startTimeEdit);
-            endDate = mEdit.getText().toString();
-            mEdit = (EditText) findViewById(R.id.endTimeEdit);
-            endTime = mEdit.getText().toString();
 
+            mEdit = (EditText) findViewById(R.id.endEdit);
+            endDate = mEdit.getText().toString();
+            df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             try {
-                addEventToCal();
-            } catch (Exception e) {
-
+                start = df.parse(startDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
+            try {
+                end = df.parse(endDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            startTime = new com.google.api.client.util.DateTime(start, TimeZone.getDefault());
+            endTime = new com.google.api.client.util.DateTime(end, TimeZone.getDefault());
         }
 
-        private void addEventToCal() throws IOException {
-
-            //mProgress.setMessage("Added Event");
-        }
 
         @Override
         protected Void doInBackground(Void... params) {
-            //String eventText = "TESTING at UCSD on June 3rd 10am-10:25am";
-            String calendarId = "primary";
-            String eventText = title + " at " + loc + " from " + startDate + " " + startTime + " till " + endDate + " " + endTime;
+            Event event = new Event()
+                    .setSummary(title)
+                    .setLocation(loc);
+            EventDateTime st = new EventDateTime()
+                    .setDateTime(startTime);
+            EventDateTime et = new EventDateTime()
+                    .setDateTime(endTime);
+            event.setStart(st);
+            event.setEnd(et);
             try {
-                AddEvents();
-                mService.events().quickAdd(calendarId, eventText).execute();
-            } catch (UserRecoverableAuthIOException e) {
-                startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
+                mService.events().insert("primary", event).execute();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
             return null;
         }
-
-        protected void AddEvents() throws IOException {
-            //mService.events().quickAdd(calendarId, eventText).execute();
-            Event event = new Event()
-                .setSummary("Google I/O 2015")
-                .setLocation("800 Howard St., San Francisco, CA 94103")
-                .setDescription("A chance to hear more about Google's developer products.");
-
-            DateTime startDateTime = new DateTime("2015-05-28T09:00:00-07:00");
-            EventDateTime start = new EventDateTime()
-                    .setDateTime(startDateTime)
-                    .setTimeZone("America/Los_Angeles");
-            event.setStart(start);
-
-            DateTime endDateTime = new DateTime("2015-05-28T17:00:00-07:00");
-            EventDateTime end = new EventDateTime()
-                    .setDateTime(endDateTime)
-                    .setTimeZone("America/Los_Angeles");
-            event.setEnd(end);
-
-            String[] recurrence = new String[] {"RRULE:FREQ=DAILY;COUNT=2"};
-            event.setRecurrence(Arrays.asList(recurrence));
-
-            EventAttendee[] attendees = new EventAttendee[] {
-                    new EventAttendee().setEmail("lpage@example.com"),
-                    new EventAttendee().setEmail("sbrin@example.com"),
-            };
-            event.setAttendees(Arrays.asList(attendees));
-
-            EventReminder[] reminderOverrides = new EventReminder[] {
-                    new EventReminder().setMethod("email").setMinutes(24 * 60),
-                    new EventReminder().setMethod("popup").setMinutes(10),
-            };
-            Event.Reminders reminders = new Event.Reminders()
-                    .setUseDefault(false)
-                    .setOverrides(Arrays.asList(reminderOverrides));
-            event.setReminders(reminders);
-
-            String calendarId = "primary";
-            try {
-                event = mService.events().insert(calendarId, event).execute();
-                System.out.printf("Event created: %s\n", event.getHtmlLink());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
-
 }
-
 
